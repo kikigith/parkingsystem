@@ -108,6 +108,12 @@ public class ParkingService {
 
 			if (ticketDAO.updateTicket(ticket)) {
 				fareCalculatorService.calculateFare(ticket);
+
+				if (isRecurringVehicle(vehicleRegNumber)) {
+					ticket.setPrice(ticket.getPrice() * 0.95);
+					ticketDAO.updateTicket(ticket);
+				}
+
 				ParkingSpot parkingSpot = ticket.getParkingSpot();
 				parkingSpot.setAvailable(true);
 				parkingSpotDAO.updateParking(parkingSpot);
@@ -120,5 +126,17 @@ public class ParkingService {
 		} catch (Exception e) {
 			logger.error("Unable to process exiting vehicle", e);
 		}
+	}
+
+	public boolean isRecurringVehicle(String vehicleRegNumber) {
+		// TODO Auto-generated method stub
+		Ticket ticket = null;
+		try {
+			ticket = ticketDAO.getTicket(vehicleRegNumber);
+
+		} catch (Exception e) {
+			System.out.println("Unable to retrieve ticket. Error occurred");
+		}
+		return (ticket != null) ? true : false;
 	}
 }
