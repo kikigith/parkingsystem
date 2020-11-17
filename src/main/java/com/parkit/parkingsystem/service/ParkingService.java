@@ -1,5 +1,6 @@
 package com.parkit.parkingsystem.service;
 
+import java.sql.Timestamp;
 import java.util.Date;
 
 import org.apache.logging.log4j.LogManager;
@@ -44,7 +45,7 @@ public class ParkingService {
 				ticket.setParkingSpot(parkingSpot);
 				ticket.setVehicleRegNumber(vehicleRegNumber);
 				ticket.setPrice(0);
-				ticket.setInTime(inTime);
+				ticket.setInTime(new Timestamp(new Date().getTime()));
 				ticket.setOutTime(null);
 				ticketDAO.saveTicket(ticket);
 				System.out.println("Generated Ticket and saved in DB");
@@ -99,15 +100,18 @@ public class ParkingService {
 		}
 	}
 
+	/**
+	 * Process vehicle exiting
+	 */
 	public void processExitingVehicle() {
 		try {
 			String vehicleRegNumber = getVehichleRegNumber();
 			Ticket ticket = ticketDAO.getTicket(vehicleRegNumber);
-			Date outTime = new Date();
-			ticket.setOutTime(outTime);
 
+			ticket.setOutTime(new Timestamp(new Date().getTime()));
+
+			fareCalculatorService.calculateFare(ticket);
 			if (ticketDAO.updateTicket(ticket)) {
-				fareCalculatorService.calculateFare(ticket);
 
 				if (isRecurringVehicle(vehicleRegNumber)) {
 					ticket.setPrice(ticket.getPrice() * 0.95);
@@ -118,8 +122,7 @@ public class ParkingService {
 				parkingSpot.setAvailable(true);
 				parkingSpotDAO.updateParking(parkingSpot);
 				System.out.println("Please pay the parking fare:" + ticket.getPrice());
-				System.out.println(
-						"Recorded out-time for vehicle number:" + ticket.getVehicleRegNumber() + " is:" + outTime);
+				System.out.println("Recorded out-time for vehicle number:" + ticket.getVehicleRegNumber());
 			} else {
 				System.out.println("Unable to update ticket information. Error occurred");
 			}
@@ -128,6 +131,12 @@ public class ParkingService {
 		}
 	}
 
+	/**
+	 * Test if a given vehicle number is a recurring vehicle
+	 * 
+	 * @param vehicleRegNumber
+	 * @return a boolean value
+	 */
 	public boolean isRecurringVehicle(String vehicleRegNumber) {
 		// TODO Auto-generated method stub
 		Ticket ticket = null;
@@ -135,7 +144,7 @@ public class ParkingService {
 			ticket = ticketDAO.getTicket(vehicleRegNumber);
 
 		} catch (Exception e) {
-			System.out.println("Unable to retrieve ticket. Error occurred");
+			logger.error("Unable to retrieve ticket. Error occurred", e);
 		}
 		return (ticket != null) ? true : false;
 	}
