@@ -1,6 +1,6 @@
 package com.parkit.parkingsystem;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -17,7 +17,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.parkit.parkingsystem.constants.Fare;
 import com.parkit.parkingsystem.constants.ParkingType;
 import com.parkit.parkingsystem.dao.ParkingSpotDAO;
 import com.parkit.parkingsystem.dao.TicketDAO;
@@ -79,7 +78,7 @@ public class ParkingServiceTest {
 	}
 
 	@Test
-	public void recurringVehicle_Shoud_benefit_five_percent_discountTest() {
+	public void recurringVehicleShoudBenefitFivePercentDiscountTest() {
 		// Vérifier si parkingService.processExitingVehicle() est
 		// appelé 2 fois avec le même véhicle number alors
 		// fareCalculatorService.calculateFare()*0.95
@@ -88,8 +87,9 @@ public class ParkingServiceTest {
 
 		DecimalFormat df = new DecimalFormat("##.###");
 
-		// THEN
-		assertThat(df.format(ticket.getPrice())).isEqualTo(df.format(Fare.CAR_RATE_PER_HOUR * 0.95));
+		// THEN getPrice() should be equal to Fare.CAR_RATE_PER_HOUR*0.95(1.5*0.95)
+		assertEquals(df.format(1.425), df.format(ticket.getPrice()));
+//		assertThat(df.format(ticket.getPrice())).isEqualTo(df.format(1.425));
 	}
 
 }

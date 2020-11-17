@@ -8,6 +8,8 @@ import java.util.Date;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.parkit.parkingsystem.constants.Fare;
 import com.parkit.parkingsystem.constants.ParkingType;
@@ -15,6 +17,7 @@ import com.parkit.parkingsystem.model.ParkingSpot;
 import com.parkit.parkingsystem.model.Ticket;
 import com.parkit.parkingsystem.service.FareCalculatorService;
 
+@ExtendWith(MockitoExtension.class)
 public class FareCalculatorServiceTest {
 
 	private static FareCalculatorService fareCalculatorService;
@@ -130,7 +133,7 @@ public class FareCalculatorServiceTest {
 	}
 
 	@Test
-	public void calculateFareCarWithLessThanThirtyMinutesParkingTimetest() {
+	public void calculateFareCarWithLessThanThirtyMinutesParkingTimeTest() {
 		Date inTime = new Date();
 		inTime.setTime(System.currentTimeMillis() - (30 * 60 * 1000));// Less than 30 minutes parking time should give 0
 																		// parking fare
@@ -146,11 +149,12 @@ public class FareCalculatorServiceTest {
 	}
 
 	@Test
-	public void calculateFareBikeWithLessThanThirtyMinutesParkingTimetest() {
+	public void calculateFareBikeWithLessThanThirtyMinutesParkingTimeTest() {
 		Date inTime = new Date();
 		inTime.setTime(System.currentTimeMillis() - (30 * 60 * 1000));// Less than 30 minutes parking time should give 0
 																		// parking fare
 		Date outTime = new Date();
+
 		ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.BIKE, false);
 
 		ticket.setInTime(inTime);
@@ -160,4 +164,20 @@ public class FareCalculatorServiceTest {
 		assertEquals(0.0, ticket.getPrice());
 
 	}
+
+//	@Test
+//	public void calculateFareShouldThrowIllegalArgumentExceptionTest() {
+//
+//		Date inTime = new Date();
+//		inTime.setTime(System.currentTimeMillis() - (45 * 60 * 1000));// 45 minutes parking time should give 3/4th
+//																		// parking fare
+//		Date outTime = new Date();
+//
+//		ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.valueOf("UNKNOWN"), false);
+//		ticket.setInTime(inTime);
+//		ticket.setOutTime(outTime);
+//
+//		assertThrows(IllegalArgumentException.class, () -> fareCalculatorService.calculateFare(ticket));
+//
+//	}
 }
